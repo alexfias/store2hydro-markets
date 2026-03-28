@@ -4,121 +4,61 @@ A PyPSA-based framework to evaluate the value of retrofitting existing hydropowe
 
 ## Overview
 
-This repository provides the **market valuation layer** of the *store2hydro* project.
+This repository provides the market valuation layer of the store2hydro project.
 
-It takes existing PyPSA(-Eur) networks as input and evaluates the **system and economic value of hydro retrofit** under different market configurations.
+It takes existing PyPSA(-Eur) networks as input and evaluates the system and economic value of hydro retrofit under different market configurations.
 
-The repository does **not construct retrofit assets itself**. Instead, it compares different **predefined system configurations**, such as:
-
-- a baseline network (no retrofit)
-- a retrofit network (hydro plants equipped with pumping capability)
-
----
-
-## Key Idea
-
-We evaluate:
-
-> What is the incremental value of hydro retrofit under different electricity market designs?
-
-This is done by comparing identical systems with and without retrofit across multiple market settings.
-
----
+The repository does not construct retrofit assets itself. Instead, it compares predefined system configurations such as:
+- a baseline network without retrofit
+- a retrofit network in which hydro plants already have pumping capability
 
 ## Market Cases
 
-The framework evaluates four market designs:
+- Case A: Energy-only
+- Case B: Energy + reserve capacity
+- Case C: Energy + reserve capacity + activation
+- Case D: Uncertain reserve prices
 
-- **Case A: Energy-only**
-  - Standard energy market (baseline PyPSA setup)
-
-- **Case B: Energy + reserve capacity**
-  - Adds reserve capacity provision and feasibility constraints
-
-- **Case C: Energy + reserve capacity + activation**
-  - Includes expected reserve activation and impacts on dispatch and storage
-
-- **Case D: Uncertain reserve prices**
-  - Introduces stochasticity in reserve market revenues
-
----
-
-## Project Scope (v0.1)
+## Current Scope
 
 Initial focus:
+- load existing PyPSA networks from `.nc` or CSV
+- run Case A for a baseline and retrofit network
+- compare objective value, prices, generation, storage behavior, and hydro revenues
 
-- Load existing PyPSA networks (`.nc` or CSV folder)
-- Evaluate different system configurations:
-  - baseline (no retrofit)
-  - retrofit scenario (provided as input)
-- Implement and run **Case A (energy-only)**
-- Compare system operation and revenues across configurations
+## Example
 
----
+Run from command line:
 
-## Workflow
-
-Typical pipeline:
-
-```python
-n = load_network(path)
-
-n = apply_market_case(n, case)   # A–D
-
-n.optimize()
-
-results = analyze(n)
-```
+python -m store2hydro_markets.main \
+  --baseline path/to/baseline.nc \
+  --retrofit path/to/retrofit.nc \
+  --solver highs \
+  --output runs/case_a_comparison.csv
 
 ## Repository Structure
 
+
+
+```text
 store2hydro-markets/
 ├─ configs/
 ├─ src/store2hydro_markets/
 │  ├─ io.py
+│  ├─ main.py
 │  ├─ cases/
-│  ├─ analysis/
+│  │  └─ case_a.py
+│  └─ analysis/
+│     └─ case_a.py
 ├─ notebooks/
-├─ runs/
+└─ runs/
 
-## Input Assumptions
+```
 
-Networks are provided as:
-NetCDF files (.nc), or
-PyPSA CSV folders
-Hydro retrofit (if present) is already encoded in the network
-The same base network structure should be used across comparisons
+## Notes
 
-## Experimental Design
-
-The framework compares along two dimensions:
-
-1. Asset configuration
-baseline hydro system
-retrofitted hydro system
-2. Market design
-Case A → D
-
-This enables clean identification of:
-
-the value of retrofit
-the impact of market design
-
-## Key Concept
-
-We evaluate the incremental value of adding pumping capability to existing hydro reservoirs.
-
-## Status
-
-Early development (v0.1)
-
-## Future Extensions
-
-Reserve capacity modeling (Case B)
-Activation modeling (Case C)
-Stochastic optimization (Case D)
-Endogenous retrofit investment (optional future work)
-Integration with PyPSA-Eur workflows
+- Networks must already contain the hydro retrofit (if applicable)
+- Ensure consistent base network when comparing scenarios
 
 ## License
 
