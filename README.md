@@ -68,6 +68,7 @@ n = apply_market_case(n, case)   # A–D
 n.optimize()
 
 results = analyze(n)
+```
 
 ## Repository Structure
 
