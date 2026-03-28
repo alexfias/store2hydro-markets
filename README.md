@@ -81,7 +81,7 @@ store2hydro-markets/
 ├─ notebooks/
 ├─ runs/
 
-##Input Assumptions
+## Input Assumptions
 
 Networks are provided as:
 NetCDF files (.nc), or
