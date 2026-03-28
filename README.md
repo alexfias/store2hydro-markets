@@ -4,41 +4,69 @@ A PyPSA-based framework to evaluate the value of retrofitting existing hydropowe
 
 ## Overview
 
-This repository builds on an existing PyPSA(-Eur) network and evaluates the incremental value of hydro retrofit across multiple market configurations.
+This repository provides the **market valuation layer** of the *store2hydro* project.
 
-We consider existing reservoir hydropower plants that are retrofitted with pumping capability, allowing them to:
-- generate electricity from natural inflow
-- store electricity via pumping
-- provide flexibility services to the power system
+It takes existing PyPSA(-Eur) networks as input and evaluates the **system and economic value of hydro retrofit** under different market configurations.
 
-Unlike conventional pumped hydro storage, these assets retain natural inflow, making them hybrid inflow-storage systems.
+The repository does **not construct retrofit assets itself**. Instead, it compares different **predefined system configurations**, such as:
+
+- a baseline network (no retrofit)
+- a retrofit network (hydro plants equipped with pumping capability)
+
+---
+
+## Key Idea
+
+We evaluate:
+
+> What is the incremental value of hydro retrofit under different electricity market designs?
+
+This is done by comparing identical systems with and without retrofit across multiple market settings.
+
+---
 
 ## Market Cases
 
-The framework evaluates four market settings:
+The framework evaluates four market designs:
 
-- Case A: Energy-only
-- Case B: Energy + reserve capacity
-- Case C: Energy + reserve capacity + activation
-- Case D: Uncertain reserve prices
+- **Case A: Energy-only**
+  - Standard energy market (baseline PyPSA setup)
+
+- **Case B: Energy + reserve capacity**
+  - Adds reserve capacity provision and feasibility constraints
+
+- **Case C: Energy + reserve capacity + activation**
+  - Includes expected reserve activation and impacts on dispatch and storage
+
+- **Case D: Uncertain reserve prices**
+  - Introduces stochasticity in reserve market revenues
+
+---
 
 ## Project Scope (v0.1)
 
 Initial focus:
 
-- Load an existing PyPSA network (.nc or CSV folder)
-- Add fixed-size pumping retrofit to selected hydro reservoirs
-- Run Case A (energy-only)
-- Compare baseline vs retrofit
+- Load existing PyPSA networks (`.nc` or CSV folder)
+- Evaluate different system configurations:
+  - baseline (no retrofit)
+  - retrofit scenario (provided as input)
+- Implement and run **Case A (energy-only)**
+- Compare system operation and revenues across configurations
+
+---
 
 ## Workflow
 
 Typical pipeline:
 
+```python
 n = load_network(path)
-n = apply_retrofit(n, config)
-n = apply_market_case(n, case)
+
+n = apply_market_case(n, case)   # A–D
+
 n.optimize()
+
 results = analyze(n)
 
 ## Repository Structure
@@ -47,11 +75,33 @@ store2hydro-markets/
 ├─ configs/
 ├─ src/store2hydro_markets/
 │  ├─ io.py
-│  ├─ retrofit.py
 │  ├─ cases/
 │  ├─ analysis/
 ├─ notebooks/
 ├─ runs/
+
+##Input Assumptions
+
+Networks are provided as:
+NetCDF files (.nc), or
+PyPSA CSV folders
+Hydro retrofit (if present) is already encoded in the network
+The same base network structure should be used across comparisons
+
+## Experimental Design
+
+The framework compares along two dimensions:
+
+1. Asset configuration
+baseline hydro system
+retrofitted hydro system
+2. Market design
+Case A → D
+
+This enables clean identification of:
+
+the value of retrofit
+the impact of market design
 
 ## Key Concept
 
@@ -63,9 +113,11 @@ Early development (v0.1)
 
 ## Future Extensions
 
-- Endogenous retrofit investment decisions
-- Optimal pumping capacity sizing
-- Stochastic optimization
+Reserve capacity modeling (Case B)
+Activation modeling (Case C)
+Stochastic optimization (Case D)
+Endogenous retrofit investment (optional future work)
+Integration with PyPSA-Eur workflows
 
 ## License
 
